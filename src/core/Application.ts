@@ -1,62 +1,41 @@
-import { calcDistance } from "../utils";
-
-export type Response = {
-  tipo: "generico" | "faccao" | "protetiva";
-  monitoradosEncontro: number[];
-  timestamp: string;
-  posicoes: Record<number, { lat: number; lon: number }>;
-  distanciaMetros: number;
-};
+import type { MeetingResponse } from "../definitions";
+import { calcDistance, unique } from "../utils";
 
 export default class Application {
-  async getCsvRows(fileName: string) {
-    const file = Bun.file(fileName);
-    return await file
-      .text()
-      .then((text) => text.split("\n").map((row) => row.split(";")));
-  }
+  async processMeetings(csv: string) {
+    const response: MeetingResponse[] = [];
+    const timestamps =
+      csv.match(/(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/gm)?.filter(unique) ??
+      [];
 
-  async processMeetings($dataSet: string) {
-    const rows = await this.getCsvRows($dataSet);
-    const response: Response[] = [];
+    for (const timestamp of timestamps) {
+      const regex = new RegExp(`^(.*)(${timestamp})(.*)$`, "gm");
+      const rows = csv.match(regex) ?? [];
 
-    for (let row = 0; row < rows.length; row++) {
-      const [
-        idA,
-        factionIdA,
-        timestampA,
-        latitudeA,
-        longitudeA,
-        hasProtectiveMeasureA,
-        idsMeasureRestrionA,
-      ] = rows[row] ?? [];
-
-      rows.forEach(
-        ([
-          idB,
-          factionIdB,
-          timestampB,
-          latitudeB,
-          longitudeB,
-          hasProtectiveMeasureB,
-          idsMeasureRestrionB,
-        ]) => {
-          if (idA == idB || timestampA != timestampB) return;
+      for (let i = 0; i < rows.length; i++) {
+        for (let j = i + 1; j < rows.length; j++) {
+          const [
+            idA,
+            factionIdA,
+            timestampA,
+            latitudeA,
+            longitudeA,
+            hasProtectiveMeasureA,
+            idsMeasureRestrionA,
+          ] = rows[i]?.split(";") ?? [];
+          const [idB, factionIdB, _, latitudeB, longitudeB] =
+            rows[j]?.split(";") ?? [];
 
           const distance = calcDistance(
-            {
-              latitude: Number(latitudeA),
-              longitude: Number(longitudeA),
-            },
-            {
-              latitude: Number(latitudeB),
-              longitude: Number(longitudeB),
-            },
+            Number(latitudeA),
+            Number(longitudeA),
+            Number(latitudeB),
+            Number(longitudeB),
           );
 
-          if (distance > 20) return;
+          if (distance >= 20) continue;
 
-          let tipo: Response["tipo"] =
+          let tipo: MeetingResponse["tipo"] =
             factionIdA == factionIdB
               ? "faccao"
               : hasProtectiveMeasureA &&
@@ -64,7 +43,7 @@ export default class Application {
                 ? "protetiva"
                 : "generico";
 
-          const data: Response = {
+          response.push({
             tipo,
             distanciaMetros: distance,
             posicoes: {
@@ -77,21 +56,29 @@ export default class Application {
                 lon: Number(longitudeB),
               },
             },
-            timestamp: String(timestampA).replaceAll('\"', ""),
+            timestamp: timestampA?.replaceAll('\"', "")!,
             monitoradosEncontro: [Number(idA), Number(idB)],
-          };
-
-          response.push(data);
-        },
-      );
+          });
+        }
+      }
     }
-
     const outFile = `temp/out-${Date.now()}.json`;
-
     await Bun.write(outFile, JSON.stringify(response));
   }
 
-  async run() {
-    this.processMeetings('dataset1.txt')
+  async run(urlOrFile: string) {
+    let csv;
+
+    if (urlOrFile.includes("http")) {
+      csv = await fetch(urlOrFile).then((res) => res.text());
+    } else {
+      csv = await Bun.file(urlOrFile).text();
+    }
+
+    if (!csv) {
+      throw new Error("erro ao procurar arquivo CSV");
+    }
+
+    this.processMeetings(csv);
   }
 }

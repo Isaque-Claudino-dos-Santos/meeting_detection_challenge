@@ -1,23 +1,50 @@
-# meeting_detection_api_challenge
+# Meeting Detection Challenge
 
-To install dependencies:
+## Resolução
+
+Todo o código que faz a resolução do problemas esta dentro de `Application@processMeetings`
+
+Primeiramente, identifico todos os timestamps possíveis e os armazeno em um array. Em seguida, percorro cada timestamp e busco na lista as linhas correspondentes a ele, executando o algoritmo de encontro.
+
+Essa organização é feita inicialmente para garantir que monitoramentos com timestamps diferentes não precisem comparar informações entre si, pois, conforme a regra, devem ser comparados apenas os registros que possuem o mesmo timestamp.
+
+Para evitar comparações duplicadas, utilizo dois loops aninhados (for i e for j), realizando as comparações em pares.
+
+os arquivos de saida fica dentro de `temp/` chamado `out-{timestemp}.json`.
+
+## Requisitos
+
+- bun
+- node 25 ou 27+
+
+## Sequencia de Comandos para Teste
+
+### Instalações
 
 ```bash
 bun install
 ```
 
-To run:
+### Build
 
 ```bash
-bun run index.ts
+bun run build
 ```
 
-To type check:
+### Start
 
 ```bash
-bun check
+bun start <url,file>
 ```
 
-Run `bun fmt` to format the code.
+#### Exemplo com URL
 
-This project was created using `bun init` in bun v1.4.4. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+```bash
+bun start htttp://321312321/example.txt
+```
+
+### Exemplo com arquivo
+
+```bash
+bun start /home/User/example/test.txt
+```

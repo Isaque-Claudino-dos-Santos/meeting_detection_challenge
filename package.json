@@ -7,7 +7,9 @@
     "typecheck": "bun check",
     "build": "bun build --minify --splitting --outdir=dist ./src/main.ts",
     "start": "bun dist/main.js",
-    "start:watch": "bun run --watch src/main.ts"
+    "start:dev": "bun run src/main.ts",
+    "start:watch": "bun run --watch src/main.ts",
+    "clear:temp": "rm -rf temp/*"
   },
   "devDependencies": {
     "@types/bun": "latest"
