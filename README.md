@@ -14,6 +14,10 @@ os arquivos de saida fica dentro de `temp/` chamado `out-{timestemp}.json`.
 
 | Pelo que entendi, trata-se de um desafio do LeetCode. Por isso, não foquei em aplicar boas práticas como SOLID ou Clean Code, mas sim em otimizar a solução e buscar o melhor desempenho possível. Obrigado!
 
+### Utilização de AI
+
+Nesse desafio, optei por não utilizar IA, buscando compreender melhor as regras e aprimorar minhas habilidades de resolução de problemas.
+
 ## Requisitos
 
 - bun
