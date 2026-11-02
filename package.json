@@ -5,8 +5,9 @@
   "private": true,
   "scripts": {
     "typecheck": "bun check",
-    "start": "bun run src/index.ts",
-    "start:watch": "bun run --watch src/index.ts"
+    "build": "bun build --minify --splitting --outdir=dist ./src/main.ts",
+    "start": "bun dist/main.js",
+    "start:watch": "bun run --watch src/main.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"
