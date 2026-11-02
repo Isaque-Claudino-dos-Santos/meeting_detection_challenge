@@ -12,6 +12,8 @@ Para evitar comparações duplicadas, utilizo dois loops aninhados (for i e for 
 
 os arquivos de saida fica dentro de `temp/` chamado `out-{timestemp}.json`.
 
+| Pelo que entendi, trata-se de um desafio do LeetCode. Por isso, não foquei em aplicar boas práticas como SOLID ou Clean Code, mas sim em otimizar a solução e buscar o melhor desempenho possível. Obrigado!
+
 ## Requisitos
 
 - bun
@@ -25,13 +27,15 @@ os arquivos de saida fica dentro de `temp/` chamado `out-{timestemp}.json`.
 bun install
 ```
 
-### Build
+### Build (Opcional)
 
 ```bash
 bun run build
 ```
 
 ### Start
+
+Caso prefira não realizado o build rode: `start:dev`
 
 ```bash
 bun start <url,file>
